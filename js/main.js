@@ -9,7 +9,12 @@ let data = {
     todo: [],
     completed: [],
 };
-
+const checkForRepeat = (text) => {
+    const todos = document.querySelectorAll('.todo-item');
+    let bool = false;
+    todos.forEach(item => {if(item.textContent === text) bool = true; });
+    return bool
+};
 
 const addItem = (name,item) =>{
     const li = document.createElement('li');
@@ -17,7 +22,6 @@ const addItem = (name,item) =>{
     const div = document.createElement('div');
     const todoRemove = document.createElement('button');
     const todoComplete = document.createElement('button');
-    
     li.classList.add('todo-item');
     div.classList.add('todo-buttons');
     todoRemove.classList.add('todo-remove');
@@ -32,23 +36,22 @@ const addItem = (name,item) =>{
 
     if(span.textContent === ''){
         alert('Нельзя добавлять пустую задачу!');
-    }else if(name === todo){
-        data.todo.push(span.textContent);
+    }else if(name === todo && !checkForRepeat(span.textContent)){
+        data.todo.push(span.textContent );
         todo.insertAdjacentElement('afterbegin', li);
-    }else if(name === completed){
+    }else if(name === completed && !checkForRepeat(span.textContent)){
         data.completed.push(span.textContent);
         completed.insertAdjacentElement('afterbegin', li);
-    };
-    
+    }else{
+        alert('Эта задача уже существует!');
+    }
     headerInput.value = '';
     saveUl();
 
-    
     todoRemove.addEventListener('click', () => removeItem(todoRemove.parentNode.parentNode));
-    
     todoComplete.addEventListener('click', () =>completeTask(todoComplete.parentNode.parentNode));
-
 };
+
 const completeTask = (todoComplete) => {
     const todoItem = document.querySelectorAll('.todo-item');
     todoItem.forEach(item => {
@@ -64,8 +67,6 @@ const completeTask = (todoComplete) => {
     });
     saveUl();
 };
-
-
 
 const removeItem = (todoDel) => {
     const todoItem = document.querySelectorAll('.todo-item');
@@ -86,14 +87,8 @@ const saveUl = () => {
     localStorage.setItem('completed',arrCompleted);
 };
 
-addButton.addEventListener('click', () => {
-    addItem(todo);
-    console.log(data.todo);
-});
-
-headerInput.addEventListener('keydown', (e) => {
-    if(e.keyCode == 13) addItem(todo);
-});
+addButton.addEventListener('click', () => addItem(todo));
+headerInput.addEventListener('keydown', (e) => {if(e.keyCode == 13) addItem(todo);});
 
 document.addEventListener("DOMContentLoaded", () => {
     const todoArr = localStorage.getItem('todo');
